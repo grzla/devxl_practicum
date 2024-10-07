@@ -36,8 +36,7 @@ Note:
 
 select
     n.cidr,
-        -- subquery to select all instances
-        (select count(*) from instances i2 where i2.network_id = n.id) as instances, 
+    count(i.network_id) as instances, 
     concat(ceil(avg(i.cpu_usage)), "%") as avg_cpu_usage,
     concat(ceil(avg(i.memory_usage)), "%") as avg_memory_usage,
     concat(ceil(avg(i.network_usage)), "%") as avg_network_usage
@@ -47,11 +46,11 @@ join instances i
 where 
     n.id in (
         -- subquery to find networks with at least one instance with cpu_usage >= 80
-        select distinct i.network_id
+        select i.network_id
         from instances i
         where i.cpu_usage >= 80
     )
 group by 
-    n.cidr, instances
+    n.cidr
 order by 
     n.cidr
