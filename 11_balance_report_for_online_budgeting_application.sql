@@ -5,18 +5,18 @@ The issue arises because the `JOIN` operation between `expenses` and `income` ta
 */
 select 
     c.email,
-    coalesce(i.total_income, 0) - coalesce(e.total_expense, 0) as balance
+    sum(i.total_income) - sum(e.total_expense) as balance
 from 
     customers c
-left join 
+join 
     (select customer_id, sum(amount) as total_income from income group by customer_id) i 
     on c.id = i.customer_id
-left join 
+join 
     (select customer_id, sum(amount) as total_expense from expenses group by customer_id) e 
     on c.id = e.customer_id
 group by 
     c.email, i.total_income, e.total_expense
 having 
-    coalesce(i.total_income, 0) - coalesce(e.total_expense, 0) < 0
+    i.total_income - e.total_expense < 0
 order by 
     c.email
