@@ -6,22 +6,22 @@ GROUP_CONCAT(expr
             
 */
 
-select 
+SELECT 
     a.iban,
     group_concat(
         t.amount
-        order by t.dt asc 
-        separator ' + '
-    ) as transactions,
-    concat('$', format(sum(cast(replace(t.amount, '$', '') as decimal(10, 2))), 2)) as total
-from 
+        ORDER BY t.dt ASC 
+        SEPARATOR ' + '
+    ) AS transactions,
+    CONCAT('$', FORMAT(SUM(CAST(REPLACE(t.amount, '$', '') AS DECIMAL(10, 2))), 2)) AS total
+FROM 
     accounts a
-join 
-    transactions t on a.id = t.account_id
-where 
-    month(t.dt) = 9
-group by 
+JOIN 
+    transactions t ON a.id = t.account_id
+WHERE 
+    MONTH(t.dt) = 9
+GROUP BY 
     a.iban
-order by 
-    count(t.amount) desc, 
-    sum(cast(replace(t.amount, '$', '') as decimal(10, 2))) desc;
+ORDER BY 
+    COUNT(t.amount) DESC, 
+    total desc
