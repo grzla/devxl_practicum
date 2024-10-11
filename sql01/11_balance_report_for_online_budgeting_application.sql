@@ -2,6 +2,7 @@
 Was having an issue whereupon testing it was observed that each income record was being repeated for as many expense items. 
 
 The issue arises because the `JOIN` operation between `expenses` and `income` tables results in a Cartesian product for each customer, leading to repeated rows. To avoid this, you should aggregate the `income` and `expenses` separately before joining them with the `customers` table.
+
 */
 select 
     c.email,
