@@ -8,4 +8,4 @@ with triangle_type as (
     end as triangle_category
     from triangles
 )
-select triangle_category from triangle_type;
+select triangle_category from triangle_type
