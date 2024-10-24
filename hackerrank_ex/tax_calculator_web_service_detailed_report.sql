@@ -26,3 +26,21 @@ total_tax - total payable amount of tax, calculated as a sum of all records in t
 
 The result should be sorted in ascending order by iban.
 */
+
+select 
+    a.iban,
+    group_concat(distinct d.income order by d.quarter separator ',') as income,
+    group_concat(concat(tg.name, '(', tg.rate, ')') order by d.quarter separator ',') as `groups`,
+    group_concat(round(d.income * cast(substring_index(tg.rate, '%', 1) as decimal) / 100, 2) order by d.quarter separator ',') as tax,
+    sum(round(d.income * cast(substring_index(tg.rate, '%', 1) as decimal) / 100, 2)) as total_tax
+from 
+    accounts a
+join 
+    declarations d on a.id = d.account_id
+join 
+    tax_groups tg on d.tax_group_id = tg.id
+group by 
+    a.iban
+order by 
+    a.iban
+;
