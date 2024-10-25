@@ -10,14 +10,11 @@ We define an employee's total earnings to be their monthly salary × months work
 total_earnings = salary * months
 max
 */
-
 select 
     max(total_earnings) as max_earnings,
     count(*) as count_max_earners
 from (
-    select 
-        employee_id,
-        salary * months as total_earnings
+    select salary * months as total_earnings
     from employee
 ) as earnings
 where total_earnings = (select max(salary * months) from employee);
