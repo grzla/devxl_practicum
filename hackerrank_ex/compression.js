@@ -40,7 +40,7 @@ function compressedString(message) {
             count++;
         // if the current character is different from the previous one, append the current character and the count to the compressed string
         } else {
-            compressed += (count > 1) ? message[i-1] + count : message[i-1];
+            count > 1 ? compressed += message[i-1] + count : compressed += message[i-1];
             count = 1;
         }
     }
