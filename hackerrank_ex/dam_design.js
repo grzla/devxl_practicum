@@ -34,32 +34,33 @@ function readLine() {
  */
 
 function maxHeight(wallPositions, wallHeights) {
-    let maxMudHeight = 0;
+    // track the highest mud segment we find
+    let maxMudHeight = 0
     
+    // check each pair of adjacent walls
     for (let i = 0; i < wallPositions.length - 1; i++) {
-        const gap = wallPositions[i + 1] - wallPositions[i] - 1;
-        if (gap <= 0) continue;
+        // calculate number of positions between walls
+        const gap = wallPositions[i + 1] - wallPositions[i] - 1
+        // skip if walls are adjacent
+        if (gap <= 0) continue
         
-        const leftHeight = wallHeights[i];
-        const rightHeight = wallHeights[i + 1];
-        const minHeight = Math.min(leftHeight, rightHeight);
-        const heightDiff = Math.abs(leftHeight - rightHeight);
+        const leftHeight = wallHeights[i]
+        const rightHeight = wallHeights[i + 1]
         
-        let maxPossibleHeight;
-        
-        if (heightDiff >= gap) {
-            // If walls differ too much in height, limited by slope
-            maxPossibleHeight = minHeight + gap;
-        } else {
-            // We can build up in the middle
-            const remainingGap = gap - heightDiff;
-            maxPossibleHeight = minHeight + heightDiff + Math.floor(remainingGap / 2);
+        // check each position between the walls
+        for (let pos = 1; pos <= gap; pos++) {
+            // max height possible when going up by 1 from left wall
+            const fromLeft = leftHeight + pos
+            // max height possible when going down by 1 from right wall
+            const fromRight = rightHeight + (gap - pos + 1)
+            // actual height is limited by both constraints
+            const heightAtPos = Math.min(fromLeft, fromRight)
+            // update max if this is highest we've seen
+            maxMudHeight = Math.max(maxMudHeight, heightAtPos)
         }
-        
-        maxMudHeight = Math.max(maxMudHeight, maxPossibleHeight);
     }
     
-    return maxMudHeight;
+    return maxMudHeight
 }
 
 function main() {
