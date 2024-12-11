@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .array-container {
+            display: flex;
+            gap: 2px;
+            height: 200px;
+            align-items: flex-end;
+        }
+        
+        .bar {
+            background: #4CAF50;
+            width: 20px;
+            transition: height 0.2s ease;
+        }
+        
+        .bar.active {
+            background: #ff4444;
+        }
+        
+        .bar.pivot {
+            background: #2196F3;
+        }
+        
+        .controls {
+            margin: 10px 0;
+        }
+        
+        button {
+            margin: 0 5px;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div>
+            <h2>Sorting Visualizer</h2>
+            <div class="controls">
+                <button onclick="generateArray()">Generate New Array</button>
+                <button onclick="startVisualization('quickSortLast')">QuickSort (Last Pivot)</button>
+                <button onclick="startVisualization('quickSortRandom')">QuickSort (Random Pivot)</button>
+                <button onclick="startVisualization('insertionSort')">Insertion Sort</button>
+            </div>
+        </div>
+        <div id="arrayContainer" class="array-container"></div>
+    </div>
+    <script>
+        let array = []
+        let delay = 100
+        
+        // Generate random array with values between 10 and 180 (for better visualization)
+        function generateArray() {
+            array = []
+            for (let i = 0; i < 15; i++) {
+                array.push(Math.floor(Math.random() * 170) + 10)
+            }
+            updateVisualization(array)
+        }
+        
+        function updateVisualization(arr, activeIdx = -1, pivotIdx = -1) {
+            const container = document.getElementById('arrayContainer')
+            container.innerHTML = ''
+            
+            arr.forEach((val, idx) => {
+                const bar = document.createElement('div')
+                bar.className = 'bar'
+                if (idx === activeIdx) bar.classList.add('active')
+                if (idx === pivotIdx) bar.classList.add('pivot')
+                bar.style.height = `${val}px`
+                container.appendChild(bar)
+            })
+        }
+        
+        async function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms))
+        }
+        
+        async function visualizeQuickSortLast(arr, start = 0, end = arr.length - 1) {
+            if (start >= end) return
+            
+            const pivot = arr[end]
+            let pivotIdx = start
+            
+            updateVisualization(arr, -1, end)
+            await sleep(delay)
+            
+            for (let i = start; i < end; i++) {
+                updateVisualization(arr, i, end)
+                await sleep(delay)
+                
+                if (arr[i] <= pivot) {
+                    if (i !== pivotIdx) {
+                        [arr[i], arr[pivotIdx]] = [arr[pivotIdx], arr[i]]
+                        updateVisualization(arr, i, end)
+                        await sleep(delay)
+                    }
+                    pivotIdx++
+                }
+            }
+            
+            [arr[pivotIdx], arr[end]] = [arr[end], arr[pivotIdx]]
+            updateVisualization(arr, -1, pivotIdx)
+            await sleep(delay)
+            
+            await visualizeQuickSortLast(arr, start, pivotIdx - 1)
+            await visualizeQuickSortLast(arr, pivotIdx + 1, end)
+        }
+        
+        async function visualizeQuickSortRandom(arr, start = 0, end = arr.length - 1) {
+            if (start >= end) return
+            
+            const pivotIdx = start + Math.floor(Math.random() * (end - start + 1))
+            const pivot = arr[pivotIdx]
+            
+            // Move pivot to end
+            [arr[pivotIdx], arr[end]] = [arr[end], arr[pivotIdx]]
+            updateVisualization(arr, -1, end)
+            await sleep(delay)
+            
+            let partitionIdx = start
+            
+            for (let i = start; i < end; i++) {
+                updateVisualization(arr, i, end)
+                await sleep(delay)
+                
+                if (arr[i] <= pivot) {
+                    if (i !== partitionIdx) {
+                        [arr[i], arr[partitionIdx]] = [arr[partitionIdx], arr[i]]
+                        updateVisualization(arr, i, end)
+                        await sleep(delay)
+                    }
+                    partitionIdx++
+                }
+            }
+            
+            [arr[partitionIdx], arr[end]] = [arr[end], arr[partitionIdx]]
+            updateVisualization(arr, -1, partitionIdx)
+            await sleep(delay)
+            
+            await visualizeQuickSortRandom(arr, start, partitionIdx - 1)
+            await visualizeQuickSortRandom(arr, partitionIdx + 1, end)
+        }
+        
+        async function visualizeInsertionSort(arr) {
+            for (let i = 1; i < arr.length; i++) {
+                let key = arr[i]
+                let j = i - 1
+                
+                updateVisualization(arr, i)
+                await sleep(delay)
+                
+                while (j >= 0 && arr[j] > key) {
+                    arr[j + 1] = arr[j]
+                    updateVisualization(arr, j)
+                    await sleep(delay)
+                    j--
+                }
+                
+                arr[j + 1] = key
+                updateVisualization(arr, j + 1)
+                await sleep(delay)
+            }
+        }
+        
+        async function startVisualization(algorithm) {
+            const arrCopy = [...array]
+            switch(algorithm) {
+                case 'quickSortLast':
+                    await visualizeQuickSortLast(arrCopy)
+                    break
+                case 'quickSortRandom':
+                    await visualizeQuickSortRandom(arrCopy)
+                    break
+                case 'insertionSort':
+                    await visualizeInsertionSort(arrCopy)
+                    break
+            }
+            updateVisualization(arrCopy) // Show final state
+        }
+        
+        // Initialize with random array
+        generateArray()
+    </script>
+</body>
+</html>
