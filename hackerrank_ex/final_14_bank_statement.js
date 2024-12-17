@@ -81,28 +81,40 @@ function readLine() {
 
 // Complete the below classes
 class BankStatement {
-    // private property
+    // private field to store account holder's name
+    // can only be accessed within this class
     #accountHolder
     
-    // public properties
-    balance
-    accountNumber
+    // public properties accessible from anywhere
+    balance      // stores current account balance
+    accountNumber    // stores unique account identifier
     
+    // initializes a new bank account
+    // params: accountHolder (string), accountNumber (string), balance (number, optional)
     constructor(accountHolder, accountNumber, balance) {
         this.#accountHolder = accountHolder
         this.accountNumber = accountNumber
-        this.balance = balance || 0
+        this.balance = balance || 0 // default balance to 0 if not provided
     }
     
+    // creates a new bank account
+    // params: name (string), number (string), balance (number, optional) 
+    // returns: status message string
     static create(name, number, balance) {
+        if (!balance) return "Invalid open account"
+        if (typeof balance !== 'number') return "Invalid open account"
         if (!number || !name) return "Invalid account"
         if (BankStatement.accounts?.[number]) return "Cannot open account"
         
+        // initialize accounts object if it doesn't exist
         if (!BankStatement.accounts) BankStatement.accounts = {}
         BankStatement.accounts[number] = new BankStatement(name, number, balance)
         return "Account created successfully"
     }
     
+    // adds money to an account
+    // params: number (string) - account number, amount (number) - amount to deposit
+    // returns: status message string
     static deposit(number, amount) {
         if (!BankStatement.accounts?.[number]) return "Account not found"
         if (amount <= 0 || typeof amount !== 'number') return "Invalid amount"
@@ -111,6 +123,9 @@ class BankStatement {
         return "Deposited successfully"
     }
     
+    // removes money from an account if sufficient funds exist
+    // params: number (string) - account number, amount (number) - amount to withdraw
+    // returns: status message string
     static withdraw(number, amount) {
         if (!BankStatement.accounts?.[number]) return "Account not found"
         if (amount <= 0 || typeof amount !== 'number') return "Invalid amount"
@@ -120,36 +135,46 @@ class BankStatement {
         return "Withdrawn successfully"
     }
     
+    // retrieves account information as JSON string
+    // params: number (string) - account number
+    // returns: JSON string with account details or error message
     static getAccountInfo(number) {
         if (!BankStatement.accounts?.[number]) return "Account not found"
         const account = BankStatement.accounts[number]
         return JSON.stringify({
             accountNumber: account.accountNumber,
-            accountName: account.#accountHolder,
+            accountHolder: account.#accountHolder,
             balance: account.balance
         })
     }
     
-    static async transfer(amount, from, to) {
-        if (!BankStatement.accounts?.[from]) return "Account not found"
+    // asynchronously transfers money between accounts
+    // params: amount (number), to (string) - target account
+    // returns: promise resolving to status message string
+    static async transfer(amount, to) {
         if (!BankStatement.accounts?.[to]) return "Account not found"
         if (amount <= 0 || typeof amount !== 'number') return "Invalid amount"
-        if (BankStatement.accounts[from].balance < amount) return "Insufficient funds available"
+        if (BankStatement.accounts[to].balance < amount) return "Insufficient funds available"
         
-        BankStatement.accounts[from].balance -= amount
-        BankStatement.accounts[to].balance += amount
+        BankStatement.accounts[to].balance -= amount
         return "Transfer success"
     }
 }
 
 class SavingsAccount extends BankStatement {
+    // public property for interest rate
     interestRate
     
+    // initializes a new savings account
+    // params: same as BankStatement constructor
     constructor(accountHolder, accountNumber, balance) {
         super(accountHolder, accountNumber, balance)
-        this.interestRate = 0
+        this.interestRate = 0 // initialize interest rate to 0
     }
     
+    // creates a new savings account
+    // params: same as BankStatement.create()
+    // returns: status message string
     static create(name, number, balance) {
         if (!number || !name) return "Invalid account"
         if (BankStatement.accounts?.[number]) return "Cannot open account"
@@ -159,16 +184,20 @@ class SavingsAccount extends BankStatement {
         return "Account created successfully"
     }
     
+    // applies interest rate to account balance
+    // params: number (string) - account number, rate (number) - interest rate percentage
+    // returns: new balance or error message
     static applyInterest(number, rate) {
         if (!BankStatement.accounts?.[number]) return "Account not found"
         if (rate <= 0 || typeof rate !== 'number') return "Invalid rate given"
         
         const account = BankStatement.accounts[number]
-        if (!(account instanceof SavingsAccount)) return "Invalid rate given"
+        // verify account is a savings account
+        if (!(account instanceof SavingsAccount)) return "Account not found"
         
         account.interestRate = rate
-        const newBalance = account.balance * (1 + rate/100)
-        account.balance = Math.floor(newBalance)
+        const newBalance = account.balance * Math.pow((1 + rate/100), 10)
+        account.balance = Math.floor(newBalance) // round down to nearest integer
         return account.balance
     }
 }
