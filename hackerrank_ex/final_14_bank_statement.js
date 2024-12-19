@@ -101,12 +101,15 @@ class BankStatement {
     // params: name (string), number (string), balance (number, optional) 
     // returns: status message string
     static create(name, number, balance) {
-        if (!balance) return "Invalid open account"
-        if (typeof balance !== 'number') return "Invalid open account"
+        console.log('create:', { name, number, balance })
+        if (balance < 0) return "Cannot open account"
+        
+        if (balance !== undefined) {
+            if (typeof balance !== 'number') return "Invalid open account"
+        }
         if (!number || !name) return "Invalid account"
         if (BankStatement.accounts?.[number]) return "Cannot open account"
         
-        // initialize accounts object if it doesn't exist
         if (!BankStatement.accounts) BankStatement.accounts = {}
         BankStatement.accounts[number] = new BankStatement(name, number, balance)
         return "Account created successfully"
@@ -116,6 +119,7 @@ class BankStatement {
     // params: number (string) - account number, amount (number) - amount to deposit
     // returns: status message string
     static deposit(number, amount) {
+        console.log('deposit:', { number, amount })
         if (!BankStatement.accounts?.[number]) return "Account not found"
         if (amount <= 0 || typeof amount !== 'number') return "Invalid amount"
         
@@ -127,6 +131,7 @@ class BankStatement {
     // params: number (string) - account number, amount (number) - amount to withdraw
     // returns: status message string
     static withdraw(number, amount) {
+        console.log('withdraw:', { number, amount })
         if (!BankStatement.accounts?.[number]) return "Account not found"
         if (amount <= 0 || typeof amount !== 'number') return "Invalid amount"
         if (BankStatement.accounts[number].balance < amount) return "Insufficient funds available"
@@ -139,6 +144,7 @@ class BankStatement {
     // params: number (string) - account number
     // returns: JSON string with account details or error message
     static getAccountInfo(number) {
+        console.log('getAccountInfo:', { number })
         if (!BankStatement.accounts?.[number]) return "Account not found"
         const account = BankStatement.accounts[number]
         return JSON.stringify({
@@ -151,12 +157,14 @@ class BankStatement {
     // asynchronously transfers money between accounts
     // params: amount (number), to (string) - target account
     // returns: promise resolving to status message string
-    static async transfer(amount, to) {
-        if (!BankStatement.accounts?.[to]) return "Account not found"
+    static async transfer(amount, from, to) {
+        console.log('transfer:', { amount, from, to })
+        if (!BankStatement.accounts?.[from] || !BankStatement.accounts?.[to]) return "Account not found"
         if (amount <= 0 || typeof amount !== 'number') return "Invalid amount"
-        if (BankStatement.accounts[to].balance < amount) return "Insufficient funds available"
+        if (BankStatement.accounts[from].balance < amount) return "Insufficient funds available"
         
-        BankStatement.accounts[to].balance -= amount
+        BankStatement.accounts[from].balance -= amount
+        BankStatement.accounts[to].balance += amount
         return "Transfer success"
     }
 }
@@ -176,6 +184,12 @@ class SavingsAccount extends BankStatement {
     // params: same as BankStatement.create()
     // returns: status message string
     static create(name, number, balance) {
+        console.log('savingsCreate:', { name, number, balance })
+        if (balance < 0) return "Cannot open account"
+        
+        if (balance !== undefined) {
+            if (typeof balance !== 'number') return "Invalid open account"
+        }
         if (!number || !name) return "Invalid account"
         if (BankStatement.accounts?.[number]) return "Cannot open account"
         
@@ -188,17 +202,17 @@ class SavingsAccount extends BankStatement {
     // params: number (string) - account number, rate (number) - interest rate percentage
     // returns: new balance or error message
     static applyInterest(number, rate) {
+        console.log('applyInterest:', { number, rate })
         if (!BankStatement.accounts?.[number]) return "Account not found"
         if (rate <= 0 || typeof rate !== 'number') return "Invalid rate given"
         
         const account = BankStatement.accounts[number]
-        // verify account is a savings account
         if (!(account instanceof SavingsAccount)) return "Account not found"
         
         account.interestRate = rate
         const newBalance = account.balance * Math.pow((1 + rate/100), 10)
-        account.balance = Math.floor(newBalance) // round down to nearest integer
-        return account.balance
+        account.balance = Math.floor(newBalance)
+        return account.balance.toString()
     }
 }
 
