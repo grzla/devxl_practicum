@@ -1,9 +1,7 @@
 /*
 5. counting hackos
 
-a coding platform maintains all the participating hackers' data in the HACKER table. write a query to print the names of
-all the hackers who have earned more than 100 hackos in less than 10 months. print the output in the ascending order
-of their ID.
+a coding platform maintains all the participating hackers' data in the HACKER table. write a query to print the names of all the hackers who have earned more than 100 hackos in less than 10 months. print the output in the ascending order of their ID.
 
 input format:
 table: HACKER
@@ -19,8 +17,7 @@ table: HACKER
 the names should be printed in the ascending order of their ID.
 
 output format:
-each row of results must contain the name of a hacker who has earned more than 100 hackos in less than 10 months,
-in the following format:
+each row of results must contain the name of a hacker who has earned more than 100 hackos in less than 10 months, in the following format:
 HACKER.NAME
 
 sample input:
@@ -33,4 +30,14 @@ table: HACKER
 | 3  | Annie Fernandez | 10      | 5      |
 | 4  | Ruth Hanson     | 5       | 15     |
 +----+-----------------+---------+--------+
+*/
+
+select CONCAT('HACKER.', name) as name
+where months < 10
+and hackos > 100
+from hacker
+order by id asc
+
+/*
+i had this query mostly correct but missed the detail about the output format being HACKER.name
 */
