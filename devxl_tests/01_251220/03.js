@@ -28,7 +28,7 @@ STDIN      Function
 30
 */
 
-function isPresent(root, val) {
+/* function isPresent(root, val) {
     // base cases: empty tree or found the value
     if (!root) {
         return 0
@@ -45,30 +45,86 @@ function isPresent(root, val) {
     // if value is greater than current node, search right subtree
     return isPresent(root.right, val)
 }
-
+ */
 // i had the tree traversal logic correct but did not understand how to handle val as an array. i am not sure if it actually is an array. (wouldn't it be called vals?)
 
-/* 
+
 // if val is an array the solution requires an internal function. 
 
 function isPresent(root, val) {
     // helper function to check single value
-    function isPresentSingle(node, value) {
-        if (!node) {
+    function isPresentSingle(root, value) {
+        if (!root) {
             return 0
         }
-        if (node.value === value) {
+        if (root.value === value) {
             return 1
         }
         
-        if (value < node.value) {
-            return isPresentSingle(node.left, value)
+        if (value < root.value) {
+            return isPresentSingle(root.left, value)
         }
         
-        return isPresentSingle(node.right, value)
+        return isPresentSingle(root.right, value)
     }
     
     // map each value in the array to its presence (1) or absence (0)
     return val.map(value => isPresentSingle(root, value))
 }
-*/
+
+// create a sample binary search tree
+const sampleTree = {
+    value: 20,
+    left: {
+        value: 10,
+        left: {
+            value: 8,
+            left: {
+                value: 6,
+                left: null,
+                right: null
+            },
+            right: null
+        },
+        right: {
+            value: 12,
+            left: {
+                value: 11,
+                left: null,
+                right: null
+            },
+            right: {
+                value: 13,
+                left: null,
+                right: null
+            }
+        }
+    },
+    right: {
+        value: 30,
+        left: {
+            value: 25,
+            left: {
+                value: 23,
+                left: null,
+                right: null
+            },
+            right: null
+        },
+        right: {
+            value: 40,
+            left: null,
+            right: null
+        }
+    }
+}
+
+// test values array
+const testValues = [20, 10, 30, 8, 12, 25, 40, 6, 11, 13, 23, 7]
+
+// test the function
+const result = isPresent(sampleTree, testValues)
+console.log('test values:', testValues)
+console.log('results:', result)
+// expected output: [1,1,1,1,1,1,1,1,1,1,1,0]
+// all values except 7 are present in the tree
