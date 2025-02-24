@@ -51,80 +51,52 @@ STDIN      Function
 
 // if val is an array the solution requires an internal function. 
 
-function isPresent(root, val) {
-    // helper function to check single value
-    function isPresentSingle(root, value) {
-        if (!root) {
-            return 0
-        }
-        if (root.value === value) {
-            return 1
-        }
-        
-        if (value < root.value) {
-            return isPresentSingle(root.left, value)
-        }
-        
-        return isPresentSingle(root.right, value)
-    }
-    
-    // map each value in the array to its presence (1) or absence (0)
-    return val.map(value => isPresentSingle(root, value))
-}
+function Node(data) {
+    this.data = data;
+    this.left = null;
+    this.right = null;
+};
 
-// create a sample binary search tree
-const sampleTree = {
-    value: 20,
-    left: {
-        value: 10,
-        left: {
-            value: 8,
-            left: {
-                value: 6,
-                left: null,
-                right: null
-            },
-            right: null
-        },
-        right: {
-            value: 12,
-            left: {
-                value: 11,
-                left: null,
-                right: null
-            },
-            right: {
-                value: 13,
-                left: null,
-                right: null
+function BinarySearchTree() {
+    this.insert = function(root, data) {
+        if (root === null) {
+            this.root = new Node(data);
+            
+            return this.root;
+        }
+        
+        if (data <= root.data) {
+            if (root.left) {
+                this.insert(root.left, data);
+            } else {
+                root.left = new Node(data);
+            }
+        } else {
+            if (root.right) {
+                this.insert(root.right, data);
+            } else {
+                root.right = new Node(data);
             }
         }
-    },
-    right: {
-        value: 30,
-        left: {
-            value: 25,
-            left: {
-                value: 23,
-                left: null,
-                right: null
-            },
-            right: null
-        },
-        right: {
-            value: 40,
-            left: null,
-            right: null
+        
+        return this.root;
+    };
+
+    
+    this.isPresent = function(root, val) {
+        console.log(`node value: ${root.data}  test val: ${val}`)
+        root.data === val ? console.log("equal") : console.log("not equal")
+        if (val == root.data) {
+            console.log("return 1?")
+            return 1
         }
-    }
-}
+        else if (root.left && val < root.data) {
+            return this.isPresent(root.left, val)
+        }
+        else if (root.right && val > root.data) {
+            return this.isPresent(root.right, val)
+        }
+        else return 0
+    };
 
-// test values array
-const testValues = [20, 10, 30, 8, 12, 25, 40, 6, 11, 13, 23, 7]
-
-// test the function
-const result = isPresent(sampleTree, testValues)
-console.log('test values:', testValues)
-console.log('results:', result)
-// expected output: [1,1,1,1,1,1,1,1,1,1,1,0]
-// all values except 7 are present in the tree
+};
