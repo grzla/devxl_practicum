@@ -20,5 +20,19 @@ constraints
 */
 
 function normalizeScores(scores) {
-    //  your code here
+    // create set of unique scores
+    // minimize scores (1,2,3)
+    // map scores to minimized scores
+    const uniqueScores = [...new Set(scores)].sort((a, b) => (a-b))
+
+    let scoreMap = {}
+    
+    uniqueScores.forEach((score, index) => {
+        scoreMap[score] = index+1
+    })
+
+    return scores.map((score) => {
+        scoreMap[score]
+    })
+
 }
