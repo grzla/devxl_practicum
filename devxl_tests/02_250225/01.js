@@ -44,3 +44,54 @@ function minNum(threshold, points) {
     }
     return points.length
 }
+
+// dp implementation for cases where taking single steps might be more optimal than always taking double steps
+function minNum(threshold, points) {
+    if (!points.length) return 0
+    
+    // dp[i][j] represents min problems needed when:
+    // i is the current index we're considering
+    // j is whether we've met the threshold (0=no, 1=yes)
+    const dp = Array(points.length).fill().map(() => Array(2).fill(Infinity))
+    
+    // base case: must solve first problem
+    dp[0][0] = 1
+    if (0 >= threshold) dp[0][1] = 1
+    
+    for (let i = 0; i < points.length - 1; i++) {
+        for (let metThreshold of [0, 1]) {
+            if (dp[i][metThreshold] === Infinity) continue
+            
+            // try taking next problem (i+1)
+            if (i + 1 < points.length) {
+                const newDiff = points[i + 1] - points[0]
+                const newMetThreshold = metThreshold || newDiff >= threshold
+                dp[i + 1][newMetThreshold] = Math.min(
+                    dp[i + 1][newMetThreshold],
+                    dp[i][metThreshold] + 1
+                )
+            }
+            
+            // try skipping one problem (i+2)
+            if (i + 2 < points.length) {
+                const newDiff = points[i + 2] - points[0]
+                const newMetThreshold = metThreshold || newDiff >= threshold
+                dp[i + 2][newMetThreshold] = Math.min(
+                    dp[i + 2][newMetThreshold],
+                    dp[i][metThreshold] + 1
+                )
+            }
+        }
+    }
+    
+    // find minimum number of problems needed to meet threshold
+    let minProblems = Infinity
+    for (let i = 0; i < points.length; i++) {
+        if (dp[i][1] !== Infinity) {
+            minProblems = Math.min(minProblems, dp[i][1])
+        }
+    }
+    
+    // if we can't meet threshold, return total length
+    return minProblems === Infinity ? points.length : minProblems
+}
