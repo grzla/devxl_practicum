@@ -35,8 +35,6 @@ Constraints:
 
 */
 
-const { SetMealRounded } = require("@mui/icons-material");
-
 /**
  * @param {string} s
  * @return {number}
