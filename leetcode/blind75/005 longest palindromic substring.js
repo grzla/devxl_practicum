@@ -62,3 +62,28 @@ var longestPalindrome = function(s) {
     
     return s.substring(start, start + maxLen)
 }
+
+// version using helper function
+var longestPalindrome = function(s) {
+    let start = 0
+    let maxLen = 1
+    
+    const expandAroundCenter = (left, right) => {
+        while (left >= 0 && right < s.length && s[left] === s[right]) {
+            const currLen = right - left + 1
+            if (currLen > maxLen) {
+                start = left
+                maxLen = currLen
+            }
+            left--
+            right++
+        }
+    }
+    
+    for (let i = 0; i < s.length; i++) {
+        expandAroundCenter(i, i + 1)      // even length
+        expandAroundCenter(i - 1, i + 1)  // odd length
+    }
+    
+    return s.substring(start, start + maxLen)
+}
