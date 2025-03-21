@@ -46,6 +46,66 @@ class ListNode {
 /**
  Do not return anything, modify head in-place instead.
  */
+// O(n^2) recursive solution
 function reorderList(head: ListNode | null): void {
+    // base cases
+    if (!head || !head.next || !head.next.next) return
     
+    // find tail and previous
+    let prev = head
+    let tail = head
+    while (tail.next) {
+        prev = tail
+        tail = tail.next
+    }
+    
+    // break the link to tail
+    prev.next = null
+    
+    // save the next node
+    let nextHead = head.next
+    
+    // connect head -> tail -> rest of list
+    head.next = tail
+    tail.next = nextHead
+    
+    // recurse on the remaining list
+    reorderList(nextHead)
 };
+
+// O(n) optimal solution - divide list in half, reverse second half and merge
+function reorderList(head: ListNode | null): void {
+    if (!head || !head.next) return
+    
+    // step 1: find middle using slow/fast pointers
+    let slow = head
+    let fast = head
+    while (fast.next && fast.next.next) {
+        slow = slow.next!
+        fast = fast.next.next
+    }
+    
+    // step 2: reverse second half
+    let second = slow.next
+    slow.next = null  // break first half
+    let prev = null
+    let curr = second
+    while (curr) {
+        let next = curr.next
+        curr.next = prev
+        prev = curr
+        curr = next
+    }
+    
+    // step 3: merge two halves
+    let first = head
+    second = prev
+    while (second) {
+        let temp1 = first.next
+        let temp2 = second.next
+        first.next = second
+        second.next = temp1
+        first = temp1!
+        second = temp2
+    }
+}
