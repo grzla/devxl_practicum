@@ -46,13 +46,117 @@ Constraints:
  * @return {number[][]}
  */
 var combinationSum = function(candidates, target) {
-    if (candidates.length === 0) return []
-
-    candidates.sort((a,b) => (a-b))
     // candidates are distinct
     // candidates may be summed any number of times
     // a combination is unique if the frequency of at least one of the candidates is different
 
-    // can eliminate any candidates greater than target
-    // how do you choose 
+    if (candidates.length === 0) return []
+
+    candidates.sort((a,b) => (a-b))
+
+    let result = []
+    let current = []
+
+    function backtrack(index, sum) {
+        // found a valid combination
+        if (sum === target) {
+            // copy current and add to result
+            result.push([...current])
+            return
+        }
+
+        // stop if we've exceeded the target
+        if (sum > target) {
+            return
+        }
+
+        // try each candidate from current index
+        for (let i=index; i<candidates.length; i++) {
+            let num = candidates[i]
+
+            // if this num would exceed target, so will remaining 
+            if (sum + num > target) break
+
+            // but since it won't exceed...
+            // include this number in our combination
+            current.push(num)
+
+            // recursive call - we can reuse this number, so we pass i
+            // will get called w/ same index until valid combo found or exceeds
+            backtrack(i, sum + num)
+
+            // backtrack by removing the number
+            current.pop()
+        }
+    }
+
+    backtrack(0,0)
+    return result
+};
+
+// if we could only use each number once
+var combinationSum = function(candidates, target) {
+    if (candidates.length === 0) return []
+    
+    candidates.sort((a,b) => (a-b))
+    
+    let result = []
+    let current = []
+    
+    function backtrack(index, sum) {
+        if (sum === target) {
+            result.push([...current])
+            return
+        }
+        
+        if (sum > target) {
+            return
+        }
+        
+        for (let i = index; i < candidates.length; i++) {
+            let num = candidates[i]
+            if (sum + num > target) break
+            
+            current.push(num)
+            // key change: pass i + 1 instead of i
+            // this means "start looking at the next number"
+            backtrack(i + 1, sum + num)
+            current.pop()
+        }
+    }
+    
+    backtrack(0, 0)
+    return result
+}
+
+// slightly more performant version (no sort)
+var combinationSum = function(candidates, target) {
+    let result = [];
+
+    function backtrack(start, path, remaining){
+        // Base Case
+        if(remaining === 0){
+            result.push([...path]);
+            return;
+        }
+        
+        for(let i=start;i<candidates.length;i++){
+            // if the current number is bigger than what we need
+            // skip it and try the next number
+            if(remaining < candidates[i]){
+                continue;
+            }
+
+            path.push(candidates[i]);
+
+            backtrack(i, path, remaining - candidates[i]);
+
+            path.pop();
+
+        }
+
+
+    }
+    backtrack(0, [], target);
+    return result;
 };
