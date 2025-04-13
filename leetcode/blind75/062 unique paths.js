@@ -52,3 +52,18 @@ var uniquePaths = function(m, n) {
     console.log(dp)
     return dp[m-1][n-1]
 }
+
+// streamlined, slightly more performant
+var uniquePaths = function (m, n) {
+    let dp = Array.from(new Array(m), () => new Array(n).fill(1));
+
+    for (let row = 1; row < m; row += 1) {
+        for (let col = 1; col < n; col += 1) {
+            let top = dp[row - 1][col];
+            let left = dp[row][col - 1];
+            dp[row][col] = top + left;
+        }
+    }
+
+    return dp[m - 1][n - 1];
+};
