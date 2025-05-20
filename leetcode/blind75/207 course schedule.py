@@ -72,4 +72,40 @@ class Solution:
             
         # check each course for cycles
         return not any(has_cycle(course) for course in range(numCourses))
-        
+
+
+
+
+from typing import List
+from collections import defaultdict
+
+class Solution:
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+        graph = {k: [] for k in range(numCourses)}
+        visited = defaultdict(int)
+
+        def buildGraph():
+            for a, b in prerequisites:
+                graph[a].append(b)
+
+        buildGraph()
+
+        def explore(node):
+            if visited[node] == 1:
+                return True
+            if visited[node] == 2:
+                return False
+            visited[node] = 1
+            for each in graph[node]:
+                if explore(each):
+                    return True
+            
+            visited[node] = 2
+            return False
+
+        for each in graph:
+            if visited[each] == 0:
+                if explore(each):
+                    return False
+
+        return True
