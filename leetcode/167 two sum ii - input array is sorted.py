@@ -67,3 +67,34 @@ class Solution:
         # this line shouldn't be needed, problem guarantees a solution
         return []
         
+
+# more pythonic solution
+class Solution:
+    def twoSum(self, numbers: List[int], target: int) -> List[int]:
+        # solution 1: pythonic two-pointer approach
+        left, right = 0, len(numbers) - 1
+        
+        while left < right:
+            curr_sum = numbers[left] + numbers[right]
+            match curr_sum:
+                case x if x == target:
+                    return [left + 1, right + 1]
+                case x if x > target:
+                    right -= 1
+                case _:
+                    left += 1
+        
+        return []
+    
+    def twoSum_dict(self, numbers: List[int], target: int) -> List[int]:
+        # solution 2: dictionary approach (uses O(n) space but more pythonic)
+        seen = {}
+        
+        # enumerate gives us index and value in one go
+        for i, num in enumerate(numbers, 1):  # 1-indexed enumeration
+            complement = target - num
+            if complement in seen:
+                return [seen[complement], i]
+            seen[num] = i
+            
+        return []  # not reached due to problem constraints
