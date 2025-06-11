@@ -52,14 +52,39 @@ var divide = function(dividend, divisor) {
     const sign = (dividend > 0) ^ (divisor > 0) ? -1 : 1
     
     // convert to positive
-    let dvd = Math.abs(dividend)
+    // handle MIN_INT special case
+    let dvd = Math.abs(dividend === MIN_INT ? dividend + 1 : dividend)
     let dvs = Math.abs(divisor)
     
-    let count = 0
-    while (dvd >= dvs) {
-        dvd -= dvs
-        count++
-    }
+    let result = 0
     
-    return sign * count
+    // for each possible power of 2, check if we can subtract
+    for (let i = 31; i >= 0; i--) {
+        if ((dvd >>> i) >= dvs) {
+            result += (1 << i)
+            dvd -= (dvs << i)
+        }
+    }
+
+    // adjust for MIN_INT special case
+    if (dividend === MIN_INT && dvd + 1 >= dvs) {
+        result++
+    }
+
+    return sign * result
 }
+
+
+/* simplified solution
+
+var divide = function(dividend, divisor) {
+    let ans = dividend/divisor;
+    let res =  ans < 0 ? -1*Math.floor(Math.abs(ans)) : Math.floor(ans);
+    
+    if(res > 2**31 - 1) return 2 ** 31 - 1;
+    if(-(2 ** 31) > res) return -(2 ** 31);
+
+    return res;
+};
+
+*/
